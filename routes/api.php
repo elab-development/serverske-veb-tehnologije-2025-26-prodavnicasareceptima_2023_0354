@@ -6,6 +6,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\StatisticsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -38,3 +39,6 @@ Route::get('/orders', [OrderController::class, 'index']);
 Route::get('/orders/{order}', [OrderController::class, 'show']);
 
 Route::get('/users/{id}/orders', [OrderController::class, 'userOrders']);
+
+Route::get('/statistics/top-products', [StatisticsController::class, 'topProducts']);
+Route::get('/statistics/revenue-by-category', [StatisticsController::class, 'revenueByCategory']);
