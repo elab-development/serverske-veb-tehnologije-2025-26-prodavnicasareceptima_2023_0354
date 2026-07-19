@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RecipeController;
 use Illuminate\Http\Request;
@@ -28,3 +29,9 @@ Route::post('/cart/items', [CartController::class, 'addItem']);
 Route::put('/cart/items/{id}', [CartController::class, 'updateItem']);
 Route::delete('/cart/items/{id}', [CartController::class, 'destroyItem']);
 Route::post('/cart/add-recipe/{recipe}', [CartController::class, 'addRecipe']);
+
+Route::post('/orders/checkout', [OrderController::class, 'checkout']);
+Route::get('/orders', [OrderController::class, 'index']);
+Route::get('/orders/{order}', [OrderController::class, 'show']);
+
+Route::get('/users/{id}/orders', [OrderController::class, 'userOrders']);
