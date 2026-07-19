@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -15,7 +16,7 @@ class ProductController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware(['auth:sanctum', 'role:admin'], only: ['store', 'update', 'destroy']),
+            new Middleware(['auth:sanctum', 'role:admin'], only: ['store', 'update', 'destroy', 'uploadImage']),
         ];
     }
 
@@ -121,6 +122,34 @@ class ProductController extends Controller implements HasMiddleware
 
         return response()->json([
             'message' => 'Product deleted successfully',
+        ]);
+    }
+
+    public function uploadImage(Request $request, Product $product)
+    {
+        $validator = Validator::make($request->all(), [
+            'image' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        if ($product->image) {
+            Storage::disk('public')->delete($product->image);
+        }
+
+        $path = $request->file('image')->store('products', 'public');
+
+        $product->update(['image' => $path]);
+        $product->load('category');
+
+        return response()->json([
+            'message' => 'Product image uploaded successfully',
+            'product' => new ProductResource($product),
         ]);
     }
 }

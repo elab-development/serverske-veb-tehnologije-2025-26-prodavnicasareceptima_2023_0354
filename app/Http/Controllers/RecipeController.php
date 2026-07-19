@@ -11,6 +11,7 @@ use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class RecipeController extends Controller implements HasMiddleware
@@ -18,7 +19,7 @@ class RecipeController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware(['auth:sanctum', 'role:admin'], only: ['store', 'update', 'destroy']),
+            new Middleware(['auth:sanctum', 'role:admin'], only: ['store', 'update', 'destroy', 'uploadImage']),
         ];
     }
 
@@ -91,6 +92,33 @@ class RecipeController extends Controller implements HasMiddleware
 
         return response()->json([
             'message' => 'Recipe deleted successfully',
+        ]);
+    }
+
+    public function uploadImage(Request $request, Recipe $recipe)
+    {
+        $validator = Validator::make($request->all(), [
+            'image' => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        if ($recipe->image) {
+            Storage::disk('public')->delete($recipe->image);
+        }
+
+        $path = $request->file('image')->store('recipes', 'public');
+
+        $recipe->update(['image' => $path]);
+
+        return response()->json([
+            'message' => 'Recipe image uploaded successfully',
+            'recipe' => new RecipeResource($recipe),
         ]);
     }
 
