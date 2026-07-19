@@ -20,6 +20,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 Route::apiResource('categories', CategoryController::class);
 Route::apiResource('products', ProductController::class);
 Route::post('/products/{product}/image', [ProductController::class, 'uploadImage']);
+Route::get('/products/{product}/nutrition-info', [ProductController::class, 'nutritionInfo']);
 
 Route::get('/recipes/suggest', [RecipeController::class, 'suggest']);
 Route::get('/recipes/{recipe}/ingredients', [RecipeController::class, 'ingredients']);

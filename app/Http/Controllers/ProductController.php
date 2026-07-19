@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Services\OpenFoodFactsService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -150,6 +151,21 @@ class ProductController extends Controller implements HasMiddleware
         return response()->json([
             'message' => 'Product image uploaded successfully',
             'product' => new ProductResource($product),
+        ]);
+    }
+
+    public function nutritionInfo(Product $product, OpenFoodFactsService $openFoodFacts)
+    {
+        $info = $openFoodFacts->searchByName($product->name);
+
+        if (! $info) {
+            return response()->json([
+                'message' => 'Nutrition data not available for this product',
+            ]);
+        }
+
+        return response()->json([
+            'data' => $info,
         ]);
     }
 }
