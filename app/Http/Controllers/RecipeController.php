@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\RecipeResource;
 use App\Models\Recipe;
+use App\Services\SpoonacularService;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -88,6 +91,38 @@ class RecipeController extends Controller implements HasMiddleware
 
         return response()->json([
             'message' => 'Recipe deleted successfully',
+        ]);
+    }
+
+    public function suggest(Request $request, SpoonacularService $spoonacular)
+    {
+        $validator = Validator::make($request->all(), [
+            'ingredients' => ['required', 'string'],
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors' => $validator->errors(),
+            ], 422);
+        }
+
+        $ingredients = array_values(array_filter(array_map('trim', explode(',', $request->input('ingredients')))));
+
+        try {
+            $recipes = $spoonacular->findByIngredients($ingredients);
+        } catch (ConnectionException $e) {
+            return response()->json([
+                'message' => 'Unable to reach the recipe suggestion service',
+            ], 503);
+        } catch (RequestException $e) {
+            return response()->json([
+                'message' => 'Recipe suggestion service returned an error',
+            ], 502);
+        }
+
+        return response()->json([
+            'data' => $recipes,
         ]);
     }
 

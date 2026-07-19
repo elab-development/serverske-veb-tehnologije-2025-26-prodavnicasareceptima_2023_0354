@@ -18,5 +18,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanc
 Route::apiResource('categories', CategoryController::class);
 Route::apiResource('products', ProductController::class);
 
+Route::get('/recipes/suggest', [RecipeController::class, 'suggest']);
 Route::get('/recipes/{recipe}/ingredients', [RecipeController::class, 'ingredients']);
 Route::apiResource('recipes', RecipeController::class);
