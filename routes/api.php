@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RecipeController;
@@ -21,3 +22,9 @@ Route::apiResource('products', ProductController::class);
 Route::get('/recipes/suggest', [RecipeController::class, 'suggest']);
 Route::get('/recipes/{recipe}/ingredients', [RecipeController::class, 'ingredients']);
 Route::apiResource('recipes', RecipeController::class);
+
+Route::get('/cart', [CartController::class, 'index']);
+Route::post('/cart/items', [CartController::class, 'addItem']);
+Route::put('/cart/items/{id}', [CartController::class, 'updateItem']);
+Route::delete('/cart/items/{id}', [CartController::class, 'destroyItem']);
+Route::post('/cart/add-recipe/{recipe}', [CartController::class, 'addRecipe']);

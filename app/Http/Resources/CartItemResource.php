@@ -13,7 +13,7 @@ class CartItemResource extends JsonResource
             'id' => $this->id,
             'quantity' => $this->quantity,
             'product' => new ProductResource($this->whenLoaded('product')),
-            'subtotal' => $this->quantity * $this->product->price,
+            'subtotal' => round($this->quantity * $this->product->price, 2),
         ];
     }
 }

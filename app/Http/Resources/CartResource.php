@@ -14,7 +14,7 @@ class CartResource extends JsonResource
             'status' => $this->status,
             'items' => CartItemResource::collection($this->whenLoaded('items')),
             'total_price' => $this->whenLoaded('items', function () {
-                return $this->items->sum(fn ($item) => $item->quantity * $item->product->price);
+                return round($this->items->sum(fn ($item) => $item->quantity * $item->product->price), 2);
             }),
         ];
     }
