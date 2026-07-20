@@ -1,0 +1,44 @@
+<?php
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RecipeController;
+use App\Http\Controllers\StatisticsController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
+Route::apiResource('categories', CategoryController::class);
+Route::apiResource('products', ProductController::class);
+Route::post('/products/{product}/image', [ProductController::class, 'uploadImage']);
+Route::get('/products/{product}/nutrition-info', [ProductController::class, 'nutritionInfo']);
+
+Route::get('/recipes/suggest', [RecipeController::class, 'suggest']);
+Route::get('/recipes/{recipe}/ingredients', [RecipeController::class, 'ingredients']);
+Route::post('/recipes/{recipe}/image', [RecipeController::class, 'uploadImage']);
+Route::apiResource('recipes', RecipeController::class);
+
+Route::get('/cart', [CartController::class, 'index']);
+Route::post('/cart/items', [CartController::class, 'addItem']);
+Route::put('/cart/items/{id}', [CartController::class, 'updateItem']);
+Route::delete('/cart/items/{id}', [CartController::class, 'destroyItem']);
+Route::post('/cart/add-recipe/{recipe}', [CartController::class, 'addRecipe']);
+
+Route::post('/orders/checkout', [OrderController::class, 'checkout']);
+Route::get('/orders', [OrderController::class, 'index']);
+Route::get('/orders/{order}', [OrderController::class, 'show']);
+
+Route::get('/users/{id}/orders', [OrderController::class, 'userOrders']);
+
+Route::get('/statistics/top-products', [StatisticsController::class, 'topProducts']);
+Route::get('/statistics/revenue-by-category', [StatisticsController::class, 'revenueByCategory']);

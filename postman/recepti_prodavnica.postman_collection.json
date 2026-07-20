@@ -1,0 +1,758 @@
+{
+	"info": {
+		"_postman_id": "8f3c9a2e-4d1b-4e6a-9c3f-2a7b5d0e1234",
+		"name": "Recepti Prodavnica API",
+		"description": "API kolekcija za aplikaciju Prodavnica sa receptima. Koristi environment 'Recepti Prodavnica' (base_url, admin_token, customer_token, customer2_token).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Petar Petrović\",\n    \"email\": \"petar.petrovic@example.com\",\n    \"password\": \"lozinka123\",\n    \"password_confirmation\": \"lozinka123\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/register",
+							"host": ["{{base_url}}"],
+							"path": ["register"]
+						},
+						"description": "Kreira novog korisnika sa rolom \"customer\" po defaultu i vraća token. Pokreni ovaj zahtev pre \"Login (Customer)\" da bi imao korisnika sa poznatom lozinkom."
+					},
+					"response": []
+				},
+				{
+					"name": "Login (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@example.com\",\n    \"password\": \"password\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": ["{{base_url}}"],
+							"path": ["login"]
+						},
+						"description": "Prijava sa seed-ovanim admin nalogom (admin@example.com / password). Token iz odgovora ručno upiši u environment varijablu admin_token."
+					},
+					"response": []
+				},
+				{
+					"name": "Login (Customer)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"petar.petrovic@example.com\",\n    \"password\": \"lozinka123\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/login",
+							"host": ["{{base_url}}"],
+							"path": ["login"]
+						},
+						"description": "Prijava korisnika kreiranog kroz \"Register\". Token iz odgovora ručno upiši u environment varijablu customer_token."
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{customer_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/logout",
+							"host": ["{{base_url}}"],
+							"path": ["logout"]
+						},
+						"description": "Briše trenutni token ulogovanog korisnika."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Authenticated User",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{customer_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": ["{{base_url}}"],
+							"path": ["user"]
+						},
+						"description": "Vraća podatke o trenutno ulogovanom korisniku."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Categories",
+			"item": [
+				{
+					"name": "List Categories",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/categories",
+							"host": ["{{base_url}}"],
+							"path": ["categories"]
+						},
+						"description": "Javna ruta - lista svih kategorija."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Category",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/1",
+							"host": ["{{base_url}}"],
+							"path": ["categories", "1"]
+						},
+						"description": "Javna ruta - detalji jedne kategorije."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Category (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Slatkiši\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/categories",
+							"host": ["{{base_url}}"],
+							"path": ["categories"]
+						},
+						"description": "Samo admin. Kreira novu kategoriju."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Category (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Slatkiši i dezerti\"\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/categories/1",
+							"host": ["{{base_url}}"],
+							"path": ["categories", "1"]
+						},
+						"description": "Samo admin. Izmena postojeće kategorije."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Category (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/categories/1",
+							"host": ["{{base_url}}"],
+							"path": ["categories", "1"]
+						},
+						"description": "Samo admin. Brisanje kategorije."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"item": [
+				{
+					"name": "List Products",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/products?per_page=10&category_id=1&min_price=100&max_price=500&search=krompir",
+							"host": ["{{base_url}}"],
+							"path": ["products"],
+							"query": [
+								{ "key": "per_page", "value": "10" },
+								{ "key": "category_id", "value": "1" },
+								{ "key": "min_price", "value": "100" },
+								{ "key": "max_price", "value": "500" },
+								{ "key": "search", "value": "krompir" }
+							]
+						},
+						"description": "Javna ruta - lista proizvoda sa paginacijom (per_page), filterima (category_id, min_price, max_price) i pretragom po nazivu (search). Ukloni/isključi query parametre koji ti ne trebaju."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/products/1",
+							"host": ["{{base_url}}"],
+							"path": ["products", "1"]
+						},
+						"description": "Javna ruta - detalji jednog proizvoda."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Product (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Brokoli\",\n    \"description\": \"Svež brokoli, domaći uzgoj\",\n    \"price\": 249.90,\n    \"unit\": \"kg\",\n    \"stock\": 50,\n    \"category_id\": 1\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/products",
+							"host": ["{{base_url}}"],
+							"path": ["products"]
+						},
+						"description": "Samo admin. Kreira novi proizvod."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Brokoli\",\n    \"description\": \"Svež brokoli, domaći uzgoj\",\n    \"price\": 269.90,\n    \"unit\": \"kg\",\n    \"stock\": 35,\n    \"category_id\": 1\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/products/1",
+							"host": ["{{base_url}}"],
+							"path": ["products", "1"]
+						},
+						"description": "Samo admin. Izmena postojećeg proizvoda."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Product (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/products/1",
+							"host": ["{{base_url}}"],
+							"path": ["products", "1"]
+						},
+						"description": "Samo admin. Brisanje proizvoda."
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Product Image (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/products/1/image",
+							"host": ["{{base_url}}"],
+							"path": ["products", "1", "image"]
+						},
+						"description": "Samo admin. Upload slike proizvoda (jpg/jpeg/png, max 2MB). Izaberi fajl u polju 'image' pre slanja."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Recipes",
+			"item": [
+				{
+					"name": "List Recipes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/recipes?per_page=10",
+							"host": ["{{base_url}}"],
+							"path": ["recipes"],
+							"query": [
+								{ "key": "per_page", "value": "10" }
+							]
+						},
+						"description": "Javna ruta - lista recepata sa paginacijom."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Recipe",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/recipes/1",
+							"host": ["{{base_url}}"],
+							"path": ["recipes", "1"]
+						},
+						"description": "Javna ruta - detalji recepta, uključujući sastojke."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Recipe Ingredients",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/recipes/1/ingredients",
+							"host": ["{{base_url}}"],
+							"path": ["recipes", "1", "ingredients"]
+						},
+						"description": "Javna ruta - lista sastojaka (proizvoda) recepta sa quantity i unit iz pivot tabele."
+					},
+					"response": []
+				},
+				{
+					"name": "Create Recipe (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Grah čorba\",\n    \"instructions\": \"Prokuvajte pasulj sa povrćem i začinima oko sat vremena na laganoj vatri.\",\n    \"prep_time\": 60\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/recipes",
+							"host": ["{{base_url}}"],
+							"path": ["recipes"]
+						},
+						"description": "Samo admin. Kreira novi recept."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Recipe (Admin)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Grah čorba sa slaninom\",\n    \"instructions\": \"Prokuvajte pasulj sa povrćem, začinima i dimljenom slaninom oko sat vremena na laganoj vatri.\",\n    \"prep_time\": 75\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/recipes/1",
+							"host": ["{{base_url}}"],
+							"path": ["recipes", "1"]
+						},
+						"description": "Samo admin. Izmena postojećeg recepta."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Recipe (Admin)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/recipes/1",
+							"host": ["{{base_url}}"],
+							"path": ["recipes", "1"]
+						},
+						"description": "Samo admin. Brisanje recepta."
+					},
+					"response": []
+				},
+				{
+					"name": "Upload Recipe Image (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "image",
+									"type": "file",
+									"src": ""
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/recipes/1/image",
+							"host": ["{{base_url}}"],
+							"path": ["recipes", "1", "image"]
+						},
+						"description": "Samo admin. Upload slike recepta (jpg/jpeg/png, max 2MB). Izaberi fajl u polju 'image' pre slanja."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "External APIs",
+			"item": [
+				{
+					"name": "Suggest Recipes by Ingredients (Spoonacular)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/recipes/suggest?ingredients=tomato,cheese,basil",
+							"host": ["{{base_url}}"],
+							"path": ["recipes", "suggest"],
+							"query": [
+								{ "key": "ingredients", "value": "tomato,cheese,basil" }
+							]
+						},
+						"description": "Javna ruta. Poziva Spoonacular findByIngredients preko SpoonacularService (keširano 60 min) i vraća predloge recepata na osnovu sastojaka."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product Nutrition Info (Open Food Facts)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" }
+						],
+						"url": {
+							"raw": "{{base_url}}/products/1/nutrition-info",
+							"host": ["{{base_url}}"],
+							"path": ["products", "1", "nutrition-info"]
+						},
+						"description": "Javna ruta. Pretražuje Open Food Facts po nazivu proizvoda (keširano 24h) i vraća pojednostavljene nutritivne podatke (kalorije, proteini, masti, ugljeni hidrati na 100g), ili poruku da podaci nisu dostupni."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Cart",
+			"item": [
+				{
+					"name": "Get Cart",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{customer_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/cart",
+							"host": ["{{base_url}}"],
+							"path": ["cart"]
+						},
+						"description": "Zahteva auth:sanctum. Prikaz korpe ulogovanog korisnika (automatski se kreira ako ne postoji)."
+					},
+					"response": []
+				},
+				{
+					"name": "Add Item to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{customer_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 1,\n    \"quantity\": 2\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/cart/items",
+							"host": ["{{base_url}}"],
+							"path": ["cart", "items"]
+						},
+						"description": "Zahteva auth:sanctum. Dodaje proizvod u korpu (ili uvećava quantity ako već postoji)."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Cart Item",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Content-Type", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{customer_token}}" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 5\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{base_url}}/cart/items/1",
+							"host": ["{{base_url}}"],
+							"path": ["cart", "items", "1"]
+						},
+						"description": "Zahteva auth:sanctum. Izmena količine stavke u korpi (id stavke iz odgovora Get Cart)."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Cart Item",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{customer_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/cart/items/1",
+							"host": ["{{base_url}}"],
+							"path": ["cart", "items", "1"]
+						},
+						"description": "Zahteva auth:sanctum. Uklanja stavku iz korpe (id stavke iz odgovora Get Cart)."
+					},
+					"response": []
+				},
+				{
+					"name": "Add Recipe to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{customer_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/cart/add-recipe/1",
+							"host": ["{{base_url}}"],
+							"path": ["cart", "add-recipe", "1"]
+						},
+						"description": "Zahteva auth:sanctum. Dodaje sve sastojke recepta (id 1) u korpu ulogovanog korisnika, u količini izračunatoj iz pivot tabele."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Orders",
+			"item": [
+				{
+					"name": "Checkout",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{customer_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/orders/checkout",
+							"host": ["{{base_url}}"],
+							"path": ["orders", "checkout"]
+						},
+						"description": "Zahteva auth:sanctum. Kreira narudžbinu na osnovu trenutne korpe ulogovanog korisnika i prazni korpu (DB transakcija)."
+					},
+					"response": []
+				},
+				{
+					"name": "List My Orders",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{customer_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/orders?per_page=10",
+							"host": ["{{base_url}}"],
+							"path": ["orders"],
+							"query": [
+								{ "key": "per_page", "value": "10" }
+							]
+						},
+						"description": "Zahteva auth:sanctum. Lista narudžbina ulogovanog korisnika, paginirano."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{customer_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/orders/1",
+							"host": ["{{base_url}}"],
+							"path": ["orders", "1"]
+						},
+						"description": "Zahteva auth:sanctum. Detalji narudžbine - dozvoljeno samo vlasniku narudžbine ili adminu (inače 403)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Orders (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/users/2/orders?per_page=10",
+							"host": ["{{base_url}}"],
+							"path": ["users", "2", "orders"],
+							"query": [
+								{ "key": "per_page", "value": "10" }
+							]
+						},
+						"description": "Samo admin (auth:sanctum + role:admin). Lista svih narudžbina korisnika sa datim id-jem."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Statistics",
+			"item": [
+				{
+					"name": "Top Products (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/statistics/top-products?limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["statistics", "top-products"],
+							"query": [
+								{ "key": "limit", "value": "10" }
+							]
+						},
+						"description": "Samo admin (auth:sanctum + role:admin). Top proizvodi po ukupno prodatoj količini (JOIN order_items + products, SUM/GROUP BY)."
+					},
+					"response": []
+				},
+				{
+					"name": "Revenue by Category (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{ "key": "Accept", "value": "application/json" },
+							{ "key": "Authorization", "value": "Bearer {{admin_token}}" }
+						],
+						"url": {
+							"raw": "{{base_url}}/statistics/revenue-by-category",
+							"host": ["{{base_url}}"],
+							"path": ["statistics", "revenue-by-category"]
+						},
+						"description": "Samo admin (auth:sanctum + role:admin). Ukupan prihod i broj prodatih stavki po kategoriji (JOIN order_items -> products -> categories, SUM/GROUP BY)."
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
