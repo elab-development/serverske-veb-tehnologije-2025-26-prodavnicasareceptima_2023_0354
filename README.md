@@ -1,58 +1,114 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Prodavnica sa receptima
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel API za veb prodavnicu namirnica povezanu sa receptima. Korisnik na osnovu sastojaka
+koje unese može da dobije predloge recepata (preko Spoonacular API-ja), a obrnuto - na osnovu
+izabranog recepta iz aplikacije, svi njegovi sastojci se automatski dodaju u korpu, spremni za
+kupovinu.
 
-## About Laravel
+## Funkcionalnosti
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Autentifikacija preko tokena (Laravel Sanctum) sa rolama `admin` i `customer`
+- CRUD upravljanje kategorijama, proizvodima i receptima (admin-only izmene, javno čitanje)
+- Korpa i narudžbine sa DB transakcijom prilikom checkout-a (sve uspe zajedno ili se sve poništi)
+- Upload slika za proizvode i recepte (Storage disk `public`)
+- Integracija sa Spoonacular API-jem - predlog recepata na osnovu unetih sastojaka
+- Integracija sa Open Food Facts API-jem - nutritivni podaci za proizvod po nazivu
+- Keširanje odgovora spoljnih API-ja (Spoonacular 60 min, Open Food Facts 24h)
+- Paginacija, filtriranje (kategorija, cenovni opseg) i pretraga po nazivu za proizvode
+- Admin statistika (top prodavani proizvodi, prihod po kategoriji) kroz JOIN + agregacione SQL upite
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tehnologije
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP ^8.3
+- Laravel Framework ^13.8
+- Laravel Sanctum ^4.0 (autentifikacija preko tokena)
+- Laravel Tinker ^3.0
+- MySQL (baza podataka)
+- Laravel HTTP Client (`Http` facade) za pozive ka Spoonacular i Open Food Facts API-jima
+- Laravel Cache (`Cache` facade) za keširanje odgovora spoljnih servisa
 
-## Learning Laravel
+## Pokretanje projekta lokalno
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. Kloniraj repozitorijum:
+   ```bash
+   git clone <URL_REPOZITORIJUMA>
+   cd serverske-veb-tehnologije-2025-26-prodavnicasareceptima_2023_0354
+   ```
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+2. Instaliraj PHP zavisnosti:
+   ```bash
+   composer install
+   ```
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+3. Kopiraj `.env.example` u `.env` i podesi konekciju ka bazi i API ključ:
+   ```bash
+   cp .env.example .env
+   ```
+   U `.env` postavi:
+   ```
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=recepti_prodavnica
+   DB_USERNAME=root
+   DB_PASSWORD=
 
-## Agentic Development
+   SPOONACULAR_API_KEY=tvoj_spoonacular_kljuc
+   ```
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+4. Generiši aplikacioni ključ:
+   ```bash
+   php artisan key:generate
+   ```
 
+5. Kreiraj MySQL bazu (npr. preko `mysql` klijenta ili HeidiSQL/phpMyAdmin):
+   ```sql
+   CREATE DATABASE recepti_prodavnica CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   ```
+
+6. Pokreni migracije i napuni bazu test podacima:
+   ```bash
+   php artisan migrate --seed
+   ```
+
+7. Poveži javni storage disk (potrebno za prikaz upload-ovanih slika):
+   ```bash
+   php artisan storage:link
+   ```
+
+8. Pokreni razvojni server:
+   ```bash
+   php artisan serve
+   ```
+
+API je zatim dostupan na `http://127.0.0.1:8000/api` (ili na portu koji izabereš uz `--port`).
+
+## Test nalozi
+
+Nakon `php artisan migrate --seed`, dostupan je sledeći nalog:
+
+- **Admin:** `admin@example.com` / `password`
+
+Ostali seed korisnici (customer nalozi) generisani su nasumično preko Faker-a (nazivi i email
+adrese se razlikuju iz seeda u seed), ali svi imaju istu lozinku: `password`. Listu trenutnih
+korisnika možeš proveriti preko:
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+php artisan tinker --execute="App\Models\User::select('email','role')->get()->each(fn(\$u) => print(\$u->email . ' - ' . \$u->role . PHP_EOL));"
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Testiranje API-ja
 
-## Contributing
+API se testira preko Postman-a. U folderu [`postman/`](postman/) nalaze se:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- `recepti_prodavnica.postman_collection.json` - kolekcija svih ruta, organizovana po resursima
+  (Auth, Categories, Products, Recipes, External APIs, Cart, Orders, Statistics)
+- `recepti_prodavnica.postman_environment.json` - environment sa varijablama `base_url`,
+  `admin_token`, `customer_token`, `customer2_token` (token vrednosti se popunjavaju ručno nakon
+  login zahteva)
 
-## Code of Conduct
+Uvezi oba fajla u Postman, izaberi environment "Recepti Prodavnica" i pokreni zahtev za login da
+dobiješ token koji zatim upisuješ u odgovarajuću environment varijablu.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## GitHub repozitorijum
 
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+https://github.com/elab-development/serverske-veb-tehnologije-2025-26-prodavnicasareceptima_2023_0354
